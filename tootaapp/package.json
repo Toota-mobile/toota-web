@@ -3,14 +3,14 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://siyabongaguliwe.github.io/tootaapp", 
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist",
-    "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "vercel --prod",
+    "start": "vite preview",
+    "lint": "eslint . --ext .js,.jsx",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.4",
@@ -28,8 +28,9 @@
     "eslint": "^9.21.0",
     "eslint-plugin-react-hooks": "^5.1.0",
     "eslint-plugin-react-refresh": "^0.4.19",
-    "gh-pages": "^6.1.1",
     "globals": "^15.15.0",
-    "vite": "^6.2.0"
+    "vite": "^6.2.0",
+    "vercel": "^34.0.0",
+    "prettier": "^3.2.5"
   }
 }

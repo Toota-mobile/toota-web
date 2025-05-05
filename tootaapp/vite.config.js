@@ -2,20 +2,43 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     tailwindcss(),
-    react()
+    react({
+      jsxImportSource: 'react', // React 19 compatible
+      babel: {
+        plugins: ['@babel/plugin-transform-react-jsx']
+      }
+    })
   ],
-  base: '/tootaapp/', // ➡️ Must match your repository name
   build: {
-    outDir: 'dist', // ➡️ Explicitly set output directory
-    emptyOutDir: true, // ➡️ Clear the directory before build
-    sourcemap: false // ➡️ Disable sourcemaps for smaller build (optional)
+    outDir: 'dist',
+    emptyOutDir: true,
+    sourcemap: false, // Disable for production
+    chunkSizeWarningLimit: 1600, // Vercel can handle larger chunks
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Optimized splitting for Vercel's CDN
+          react: ['react', 'react-dom'],
+          router: ['react-router-dom'],
+          icons: ['react-icons'],
+          vendor: ['tailwindcss']
+        }
+      }
+    }
   },
   server: {
-    port: 3000, // ➡️ Set development server port (optional)
-    open: true // ➡️ Automatically open browser (optional)
+    port: 3000,
+    open: true,
+    hmr: {
+      protocol: 'ws',
+      host: 'localhost'
+    }
+  },
+  preview: {
+    port: 4173,
+    open: true
   }
 })
