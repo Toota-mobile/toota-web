@@ -17,7 +17,7 @@ function LandingPage() {
       <nav className="navbar flex justify-between items-center p-4 bg-opacity-80 bg-black text-white">
         <div className="flex space-x-4 items-center">
           {/* Logo & Title */}
-          <img src="/images/logo.png" alt="Toota Logo" className="w-12 h-12" />
+          <img src="public/images/logo.png" alt="Toota Logo" className="w-12 h-12" />
           <h1 className="text-xl font-bold text-orange-500">Toota</h1>
 
           {/* Navigation Links */}
