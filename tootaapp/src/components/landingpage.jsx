@@ -75,13 +75,13 @@ function LandingPage() {
     <div className="delivery-options grid grid-cols-1 sm:grid-cols-2 gap-4">
       {/* Small Parcel */}
       <div className="option text-center">
-        <img src="/public/images/close-up-delivery.jpg" alt="Small Parcel" className="option-img w-40 mx-auto"/>
+        <img src="public/images/close-up-delivery.jpg" alt="Small Parcel" className="option-img w-40 mx-auto"/>
         <p className="text-lg font-semibold mt-2">Move Small Parcel</p>
       </div>
 
       {/* Goods/Furniture */}
       <div className="option text-center">
-        <img src="/public/images/black-female-courier.jpg" alt="Furniture Delivery" className="option-img w-40 mx-auto"/>
+        <img src="public/images/black-female-courier.jpg" alt="Furniture Delivery" className="option-img w-40 mx-auto"/>
         <p className="text-lg font-semibold mt-2">Move Goods/Furniture</p>
       </div>
       </div>

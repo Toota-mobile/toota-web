@@ -20,7 +20,7 @@ function DriverSignin() {
       {/* Main Content */}
       <div
         className="flex-grow flex flex-col items-center justify-center bg-cover bg-center px-4"
-        style={{ backgroundImage: "url('/public/images/cool.jpg')" }}
+        style={{ backgroundImage: "url('public/images/cool.jpg')" }}
       >
         <div className="bg-white bg-opacity-80 p-6 rounded shadow-md w-full max-w-md">
           <h2 className="text-2xl font-bold text-orange-500 mb-4 text-center">Driver Sign In</h2>

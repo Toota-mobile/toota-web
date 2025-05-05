@@ -16,7 +16,7 @@ function IndividualSignin() {
       {/* Navbar */}
       <nav className="navbar flex justify-between items-center p-4 bg-opacity-80 bg-black text-white">
         <div className="flex space-x-4 items-center">
-          <img src="/public/images/logo.png" alt="Toota Logo" className="w-12 h-12" />
+          <img src="public/images/logo.png" alt="Toota Logo" className="w-12 h-12" />
           <h1 className="text-xl font-bold text-orange-500">Toota</h1>
           <div className="hidden sm:flex space-x-3">
             <Link to="/" className="hover:text-orange-300">Home</Link>
@@ -36,7 +36,7 @@ function IndividualSignin() {
       {/* Main Content */}
       <div
         className="flex-grow flex flex-col items-center justify-center bg-cover bg-center px-4"
-        style={{ backgroundImage: "url('/public/images/close.jpg')" }}
+        style={{ backgroundImage: "url('public/images/close.jpg')" }}
       >
         <div className="bg-white bg-opacity-80 p-6 rounded shadow-md w-full max-w-md">
           <h2 className="text-2xl font-bold text-orange-500 mb-4 text-center">User Sign In</h2>

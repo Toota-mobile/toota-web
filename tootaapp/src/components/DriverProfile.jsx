@@ -42,16 +42,23 @@ const DriverProfile = () => {
     <div className="min-h-screen bg-gray-50">
       {/* Fixed Header (consistent with your dashboard) */}
       <header className="bg-white shadow-sm p-4 fixed top-0 left-0 right-0 z-50">
-        <div className="container mx-auto flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-orange-500">Driver Profile</h1>
-          <nav className="flex items-center space-x-6">
-            <Link to="/driver-dashboard" className="text-gray-600 hover:text-orange-500 font-medium">
-              Dashboard
-            </Link>
-          </nav>
-        </div>
-      </header>
-
+  <div className="container mx-auto flex justify-between items-center">
+    <h1 className="text-2xl font-bold text-orange-500">Driver Profile</h1>
+    <nav className="flex items-center space-x-6">
+      <Link 
+        to="/driver-dashboard" 
+        className="flex items-center space-x-2 text-gray-600 hover:text-orange-500 font-medium group"
+      >
+        <img 
+          src="public/images/logo.png" 
+          alt="Dashboard"
+          className="h-14 w-14 object-contain transition-transform group-hover:scale-105"
+        />
+        <span className="hidden sm:inline">Dashboard</span> {/* Text hidden on mobile */}
+      </Link>
+    </nav>
+  </div>
+</header>
       {/* Main Content */}
       <main className="container mx-auto p-4 pt-24">
         <div className="bg-white rounded-lg shadow-md overflow-hidden">

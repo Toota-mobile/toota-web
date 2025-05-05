@@ -25,7 +25,7 @@ const About = () => {
               Same day delivery, Express delivery, E-commerce logistics, International Shipping
             </p>
             <img
-              src="/public/images/deliver.jpg"
+              src="public/images/deliver.jpg"
               alt="Delivery service"
               className="rounded-xl shadow-lg w-full object-cover"
             />
@@ -102,7 +102,7 @@ const About = () => {
       <div className="flex flex-wrap items-center justify-start sm:justify-between max-w-6xl mx-auto px-4 mb-4">
       {/* Logo + Toota */}
       <div className="flex items-center space-x-2">
-      <img src="/public/images/logo.png" alt="Toota Logo" className="w-13 h-13" />
+      <img src="public/images/logo.png" alt="Toota Logo" className="w-13 h-13" />
       <span className="text-orange-400 font-bold text-lg">Toota</span>
       </div>
 

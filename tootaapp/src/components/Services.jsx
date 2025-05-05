@@ -5,7 +5,7 @@ import { FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn } from "react-icons/f
 
 const servicesList = [
   {
-    icon: <img src="/public/images/send parcels.png" alt="Parcel Delivery" className="w-32 h-32 object-cover rounded-lg" />,
+    icon: <img src="public/images/send parcels.png" alt="Parcel Delivery" className="w-32 h-32 object-cover rounded-lg" />,
     title: (
       <span className="flex items-center gap-2 text-orange-500">
         Parcel Delivery <FaArrowRight className="text-orange-500" />
@@ -14,7 +14,7 @@ const servicesList = [
     description: "Courier service for urgent deliveries.",
   },
   {
-    icon: <img src="/public/images/one.png" alt="Furniture Moving" className="w-34 h-34 object-cover rounded-lg" />,
+    icon: <img src="public/images/one.png" alt="Furniture Moving" className="w-34 h-34 object-cover rounded-lg" />,
     title: (
       <span className="flex items-center gap-2 text-orange-500">
         Furniture Moving <FaArrowRight className="text-orange-500" />
@@ -23,7 +23,7 @@ const servicesList = [
     description: "Move large goods and furniture safely with our trusted service.",
   },
   {
-    icon: <img src="/public/images/calend.png" alt="Scheduled Delivery" className="w-32 h-32 object-cover rounded-lg" />,
+    icon: <img src="public/images/calend.png" alt="Scheduled Delivery" className="w-32 h-32 object-cover rounded-lg" />,
     title: (
       <span className="flex items-center gap-2 text-orange-500">
         Scheduled Delivery <FaArrowRight className="text-orange-500" />
@@ -38,19 +38,19 @@ const customerReviews = [
     name: "Emily Watson",
     review: "Fast and reliable service! My package arrived earlier than expected.",
     rating: 5,
-    image: "/public/images/cb.jpg",
+    image: "public/images/cb.jpg",
   },
   {
     name: "James Rodriguez",
     review: "Great experience! The team was friendly and handled my furniture with care.",
     rating: 4,
-    image: "/public/images/white.jpg",
+    image: "public/images/white.jpg",
   },
   {
     name: "Karabo Augustina Matlabe",
     review: "Scheduled delivery was seamless and on time. Highly recommend!",
     rating: 5,
-    image: "/public/images/baby.jpg",
+    image: "public/images/baby.jpg",
   },
 ];
 
@@ -98,7 +98,7 @@ const Services = () => {
   <div className="max-w-4xl mx-auto flex flex-col items-center">
     {/* Logo and Title */}
     <div className="flex items-center justify-center space-x-3 mb-4">
-      <img src="/public/images/logo.png" alt="Toota Logo" className="w-17 h-17 object-cover"/>
+      <img src="public/images/logo.png" alt="Toota Logo" className="w-17 h-17 object-cover"/>
       <h2 className="text-2xl font-bold text-black">Toota</h2> 
     </div>
 

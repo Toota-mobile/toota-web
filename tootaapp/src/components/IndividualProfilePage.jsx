@@ -113,7 +113,7 @@ function UserDashboard() {
       <header className="bg-white shadow-sm p-4 fixed top-0 left-0 right-0 z-50">
         <div className="container mx-auto flex justify-between items-center">
           <div className="flex items-center space-x-2">
-            <img src="/public/images/logo.png" alt="Toota Logo" className="w-14 h-14" />
+            <img src="public/images/logo.png" alt="Toota Logo" className="w-14 h-14" />
             <h1 className="text-xl font-bold text-orange-500">Toota</h1>
           </div>
           <div className="flex items-center space-x-6">

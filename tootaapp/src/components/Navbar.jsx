@@ -8,7 +8,7 @@ function Navbar() {
     <nav className="navbar flex justify-between items-center p-4 bg-opacity-80 bg-black text-white">
       <div className="flex space-x-4 items-center">
         {/* Logo & Title */}
-        <img src="/public/images/logo.png" alt="Toota Logo" className="w-14 h-14" />
+        <img src="public/images/logo.png" alt="Toota Logo" className="w-14 h-14" />
         <h1 className="text-xl font-bold text-orange-500">Toota</h1>
 
         {/* Navigation Links */}

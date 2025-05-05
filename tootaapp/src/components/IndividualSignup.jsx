@@ -31,7 +31,7 @@ const IndividualSignup = () => {
       {/* Navbar */}
       <nav className="navbar flex justify-between items-center p-4 bg-opacity-80 bg-black text-white">
         <div className="flex space-x-4 items-center">
-          <img src="/public/images/logo.png" alt="Toota Logo" className="w-14 h-14" />
+          <img src="public/images/logo.png" alt="Toota Logo" className="w-14 h-14" />
           <h1 className="text-xl font-bold text-orange-500">Toota</h1>
           <div className="hidden sm:flex space-x-3">
             <Link to="/" className="hover:text-orange-300">Home</Link>
@@ -51,7 +51,7 @@ const IndividualSignup = () => {
       </nav>
 
       {/* Main Section */}
-      <div className="flex-grow flex flex-col justify-center items-center p-6 bg-cover bg-center" style={{ backgroundImage: "url('/public/images/vcd.jpg')" }}>
+      <div className="flex-grow flex flex-col justify-center items-center p-6 bg-cover bg-center" style={{ backgroundImage: "url('public/images/vcd.jpg')" }}>
         <div className="bg-white bg-opacity-80 p-8 rounded-lg shadow-lg w-full max-w-md">
           {/* Back Button */}
           <div className="self-start mb-4">

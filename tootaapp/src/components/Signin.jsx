@@ -8,7 +8,7 @@ function Signin() {
       {/* Navbar */}
       <nav className="navbar flex justify-between items-center p-4 bg-opacity-80 bg-black text-white">
         <div className="flex space-x-4 items-center">
-          <img src="/public/images/logo.png" alt="Toota Logo" className="w-14 h-14" />
+          <img src="public/images/logo.png" alt="Toota Logo" className="w-14 h-14" />
           <h1 className="text-xl font-bold text-orange-500">Toota</h1>
           <div className="hidden sm:flex space-x-3">
             <Link to="/" className="hover:text-orange-300">Home</Link>
@@ -30,7 +30,7 @@ function Signin() {
       {/* Main Section */}
       <div
         className="flex-grow flex flex-col justify-center items-center p-6 bg-cover bg-center"
-        style={{ backgroundImage: "url('/public/images/red.jpg')" }}
+        style={{ backgroundImage: "url('public/images/red.jpg')" }}
       >
         <div className="bg-white bg-opacity-80 p-8 rounded-lg shadow-lg flex flex-col items-center">
           <h1 className="text-3xl font-bold mb-6 text-orange-500">Choose Sign In Type</h1>

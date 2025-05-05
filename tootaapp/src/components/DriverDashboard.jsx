@@ -82,7 +82,15 @@ const DriverDashboard = () => {
       {/* Fixed Dashboard Header */}
       <header className="bg-white shadow-sm p-4 fixed top-0 left-0 right-0 z-50">
   <div className="container mx-auto flex justify-between items-center">
-    <h1 className="text-2xl font-bold text-orange-500">Driver Dashboard</h1>
+    <div className="flex items-center space-x-4">
+      {/* Logo added here */}
+      <img 
+        src="public/images/logo.png" 
+        alt="Company Logo"
+        className="h-14 w-14 object-contain"
+      />
+      <h1 className="text-2xl font-bold text-orange-500">Driver Dashboard</h1>
+    </div>
     <nav className="flex items-center space-x-6">
       <Link to="/" className="text-gray-600 hover:text-orange-500 font-medium">
         Home
