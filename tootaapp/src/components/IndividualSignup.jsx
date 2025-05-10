@@ -74,7 +74,7 @@ const IndividualSignup = () => {
             </div>
 
             <div>
-              <label htmlFor="number" className="block text-gray-700 font-semibold mb-1">Email</label>
+              <label htmlFor="number" className="block text-gray-700 font-semibold mb-1">Number</label>
               <input
                 id="number"
                 name="number"
@@ -87,7 +87,7 @@ const IndividualSignup = () => {
               />
             </div>
             <div>
-              <label htmlFor="number" className="block text-gray-700 font-semibold mb-1">Email</label>
+              <label htmlFor="number" className="block text-gray-700 font-semibold mb-1">Create Password</label>
               <input
                 id="password"
                 name="password"

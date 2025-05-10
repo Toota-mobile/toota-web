@@ -52,7 +52,7 @@ function DriverSignup() {
               />
             </div>
             <div>
-              <label className="block text-gray-700 font-semibold mb-2" htmlFor="email">
+              <label className="block text-gray-700 font-semibold mb-2" htmlFor="number">
                 Enter Your Number
               </label>
               <input
@@ -63,7 +63,7 @@ function DriverSignup() {
               />
             </div>
             <div>
-              <label className="block text-gray-700 font-semibold mb-2" htmlFor="email">
+              <label className="block text-gray-700 font-semibold mb-2" htmlFor="plate">
                 Enter your Number Plate
               </label>
               <input
@@ -74,7 +74,7 @@ function DriverSignup() {
               />
             </div>
             <div>
-              <label className="block text-gray-700 font-semibold mb-2" htmlFor="email">
+              <label className="block text-gray-700 font-semibold mb-2" htmlFor="model">
                 Enter Your Truck Model
               </label>
               <input
@@ -85,7 +85,7 @@ function DriverSignup() {
               />
             </div>
             <div>
-              <label className="block text-gray-700 font-semibold mb-2" htmlFor="email">
+              <label className="block text-gray-700 font-semibold mb-2" htmlFor="color">
                 Enter Your Truck color
               </label>
               <input
@@ -96,7 +96,17 @@ function DriverSignup() {
               />
             </div>
    
-
+            <div>
+              <label className="block text-gray-700 font-semibold mb-2" htmlFor="password">
+                Create Password
+              </label>
+              <input
+                type="truck color"
+                id="truck color"
+                className="w-full border border-gray-300 p-2 rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none"
+                required
+              />
+            </div>
             <button
               type="submit"
               className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 rounded-lg"
