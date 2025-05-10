@@ -129,6 +129,12 @@ function UserDashboard() {
             >
               About
             </Link>
+            <Link 
+              to="/Signup" 
+              className="text-gray-600 hover:text-orange-500 font-medium transition-colors"
+            >
+              Become a Driver
+            </Link>
             <span className="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm font-medium">
               User
             </span>

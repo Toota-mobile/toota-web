@@ -1,7 +1,7 @@
 // src/components/DriverSignin.jsx
 import React from "react";
 import { useNavigate, Link } from "react-router-dom";
-import Navbar from "./Navbar"; // Adjust the path as necessary
+import Navbar from "./Navbar"; 
 
 function DriverSignin() {
   const navigate = useNavigate();
