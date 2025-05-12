@@ -66,7 +66,7 @@ const IndividualSignup = () => {
 
     try {
       // 3) Hit signup endpoint
-      const response = await fetch('http://127.0.0.1:8000/auth/signup/user/', {
+      const response = await fetch('https://toota-web.onrender.com/auth/signup/user/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(submissionData),

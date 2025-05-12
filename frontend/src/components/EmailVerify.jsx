@@ -38,7 +38,7 @@ const EmailVerification = () => {
   const verifyPin = async (code) => {
     try {
       const email = localStorage.getItem("email");
-      const response = await fetch("http://127.0.0.1:8000/auth/verify-email/", {
+      const response = await fetch("https://toota-web.onrender.com/auth/verify-email/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, otp:code }),
@@ -61,7 +61,7 @@ const EmailVerification = () => {
   const handleResend = async () => {
     try {
       const email = localStorage.getItem("email");
-      const response = await fetch("http://localhost:8000/auth/resend-code/", {
+      const response = await fetch("https://toota-web.onrender.com/auth/resend-code/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),

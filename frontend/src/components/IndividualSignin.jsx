@@ -19,7 +19,7 @@ function IndividualSignin() {
 
     try {
       localStorage.setItem("email", email);
-      const response = await fetch("http://localhost:8000/auth/login/user/", {
+      const response = await fetch("https://toota-web.onrender.com/auth/login/user/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
