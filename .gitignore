@@ -1,0 +1,30 @@
+.vite/
+# --- Node / React (frontend/)
+frontend/node_modules/
+frontend/build/
+frontend/dist/
+frontend/.env
+frontend/.next/
+frontend/.parcel-cache/
+frontend/.turbo/
+frontend/.cache/
+
+# --- Django (toota-web/)
+toota-web/__pycache__/
+toota-web/**/*.pyc
+toota-web/db.sqlite3
+toota-web/media/
+toota-web/staticfiles/
+toota-web/.env
+toota-web/.DS_Store
+toota-web/*.sqlite3
+toota-web/local_settings.py
+
+# --- OS / Editor stuff ---
+*.log
+*.swp
+*.swo
+.DS_Store
+.env
+.idea/
+.vscode/
