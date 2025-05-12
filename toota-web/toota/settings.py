@@ -16,7 +16,7 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 
 CORS_ALLOW_ALL_ORIGINS = True
 ALLOWED_HOSTS = [
-    'toota-mobile-sa.onrender.com',  # Production domain
+    'toota-web.onrender.com',  # Production domain
     '127.0.0.1',                     # Local IPv4
     'localhost',                      # Localhost
 ]
