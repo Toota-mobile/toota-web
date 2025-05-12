@@ -91,6 +91,7 @@ const IndividualSignup = () => {
 
       // 6) Success!
       console.log('Signup successful:', data);
+      navigate("/verify-email");
     } catch (err) {
       console.error('Signup error:', err.message);
 
