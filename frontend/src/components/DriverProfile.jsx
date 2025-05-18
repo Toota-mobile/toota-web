@@ -50,7 +50,7 @@ const DriverProfile = () => {
         className="flex items-center space-x-2 text-gray-600 hover:text-orange-500 font-medium group"
       >
         <img 
-          src="public/images/logo.png" 
+          src="/images/logo.png" 
           alt="Dashboard"
           className="h-14 w-14 object-contain transition-transform group-hover:scale-105"
         />

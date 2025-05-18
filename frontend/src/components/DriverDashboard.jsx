@@ -85,7 +85,7 @@ const DriverDashboard = () => {
     <div className="flex items-center space-x-4">
       {/* Logo added here */}
       <img 
-        src="public/images/logo.png" 
+        src="/images/logo.png" 
         alt="Company Logo"
         className="h-14 w-14 object-contain"
       />

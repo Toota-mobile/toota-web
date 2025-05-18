@@ -19,9 +19,13 @@ function LandingPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-     <Navbar/>
+      <Navbar/>
+
       {/* Hero Section with Realistic Truck Background */}
-      <div className="truck-background min-h-screen pt-24 flex flex-col justify-center items-center text-white text-center px-6 sm:px-10 relative">
+      <div 
+        className="truck-background min-h-screen pt-24 flex flex-col justify-center items-center text-white text-center px-6 sm:px-10 relative"
+        style={{ backgroundImage: "url('/Images/Realistic truck.png')", backgroundSize: "cover", backgroundPosition: "center" }}
+      >
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-black bg-orange-500 px-4 py-2 rounded-md">
           Toota
         </h1>
@@ -48,23 +52,24 @@ function LandingPage() {
           </button>
         </div>
 
-         {/* Delivery Selection Right Below Tracking */}
-  <div className="delivery-selection mt-6 p-6 rounded-lg shadow-lg bg-opacity-60 bg-black text-white w-full max-w-lg">
-    <h2 className="text-center text-3xl font-bold mb-4">What do you want to deliver?</h2>
-    <div className="delivery-options grid grid-cols-1 sm:grid-cols-2 gap-4">
-      {/* Small Parcel */}
-      <div className="option text-center">
-        <img src="/Images/close-up-delivery.jpg" alt="Small Parcel" className="option-img w-40 mx-auto"/>
-           <p className="text-lg font-semibold mt-2">Move Small Parcel</p>
+        {/* Delivery Selection Right Below Tracking */}
+        <div className="delivery-selection mt-6 p-6 rounded-lg shadow-lg bg-opacity-60 bg-black text-white w-full max-w-lg">
+          <h2 className="text-center text-3xl font-bold mb-4">What do you want to deliver?</h2>
+          <div className="delivery-options grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Small Parcel */}
+            <div className="option text-center">
+              <img src="/Images/close-up-delivery.jpg" alt="Small Parcel" className="option-img w-40 mx-auto"/>
+              <p className="text-lg font-semibold mt-2">Move Small Parcel</p>
             </div>
-              {/* Goods/Furniture */}
-             <div className="option text-center">
-             <img src="/Images/black-female-courier.jpg" alt="Furniture Delivery" className="option-img w-40 mx-auto"/>
-             <p className="text-lg font-semibold mt-2">Move Goods/Furniture</p>
-           </div>
+            {/* Goods/Furniture */}
+            <div className="option text-center">
+              <img src="/Images/black-female-courier.jpg" alt="Furniture Delivery" className="option-img w-40 mx-auto"/>
+              <p className="text-lg font-semibold mt-2">Move Goods/Furniture</p>
+            </div>
           </div>
-          </div>
-         </div>
+        </div>
+      </div>
+
       {/* Services Section */}
       <div className="p-4 sm:p-6 text-center bg-white">
         <Services />
@@ -74,3 +79,4 @@ function LandingPage() {
 }
 
 export default LandingPage;
+

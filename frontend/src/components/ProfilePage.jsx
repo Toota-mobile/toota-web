@@ -45,7 +45,7 @@ const ProfilePage = () => {
       </button>
       <Link to="/" className="flex items-center space-x-2">
         <img 
-          src="../Images/logo.png" 
+          src="/Images/logo.png" 
           alt="Toota Logo"
           className="w-14 h-14"
         />

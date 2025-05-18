@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import MD5 from "crypto-js/md5";
 import {
   FaUser, FaTruck, FaShippingFast, FaCar, FaMotorcycle,
   FaTachometerAlt, FaMapMarkerAlt, FaImage, FaInfoCircle,

@@ -252,4 +252,4 @@ const IndividualSignup = () => {
   );
 };
 
-export default IndividualSignup;
+export default IndividualSignup
