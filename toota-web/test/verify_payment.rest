@@ -1,0 +1,6 @@
+post http://localhost:8000/payment/verify/
+content-type: application/json
+
+{
+  "transaction_id": "963925c8-e081-4adb-b7fa-ab8008bc27bc"
+}

@@ -13,7 +13,8 @@ from .models import Trip
 from channels.exceptions import StopConsumer
 from payments.models import Payment
 from django.db.models import Q
-from .utils import get_route_data, find_nearest_drivers, is_peak_hour_or_festive
+from .utils import (get_google_route_data, find_nearest_drivers,
+                    is_peak_hour_or_festive, get_coordinates, reverse_geocode)
 
 
 logger = logging.getLogger(__name__)
@@ -184,7 +185,7 @@ class UserGetLocationConsumer(AsyncWebsocketConsumer):
     async def driver_location_update(self, event):
         driver_details = event["driver_details"]
         route_data = await asyncio.wait_for(
-                    get_route_data(self.user_latitude, self.user_longitude, driver_details['latitude'], driver_details['longitude']),
+                    get_google_route_data(self.user_latitude, self.user_longitude, driver_details['latitude'], driver_details['longitude']),
                     timeout=20
                 )
         driver_details["duration"] = route_data['duration']
@@ -277,16 +278,35 @@ class TripRequestConsumer(AsyncWebsocketConsumer):
                 vehicle_type = data.get("vehicle_type")
                 pickup = data.get("pickup")
                 destination = data.get("destination")
-                pickup_latitude = data.get("pickup_latitude")
-                pickup_longitude = data.get("pickup_longitude")
-                dest_latitude = data.get("dest_latitude")
-                dest_longitude = data.get("dest_longitude")
+                # print(f"Pickup: {pickup}, Destination: {destination}")
+                pickup_latitude, pickup_longitude = await asyncio.wait_for(
+                    get_coordinates(pickup), timeout=60
+                )
+                # print(f"Pickup coordinates: {pickup_latitude}, {pickup_longitude}")
+                # get_pick = reverse_geocode(pickup_latitude, pickup_longitude)
+                # print(f"Pickup reverse geocode: {get_pick}")
+                if not pickup_latitude or not pickup_longitude:
+                    await self.send(text_data=json.dumps({"type": "error", "message": "Invalid pickup location"}))
+                    return
+
+                dest_latitude, dest_longitude = await asyncio.wait_for(
+                    get_coordinates(destination), timeout=60
+                )
+                # print(f"Destination coordinates: {dest_latitude}, {dest_longitude}")
+                # get_dest = reverse_geocode(dest_latitude, dest_longitude)
+                # print(f"Destination reverse geocode: {get_dest}")
+                if not dest_latitude or not dest_longitude:
+                    await self.send(text_data=json.dumps({"type": "error", "message": "Invalid destination location"}))
+                    return
                 load_description = data.get("load_description", "")
 
                 route_data = await asyncio.wait_for(
-                    get_route_data(pickup_latitude, pickup_longitude, dest_latitude, dest_longitude),
-                    timeout=20
+                    get_google_route_data(pickup_latitude, pickup_longitude, dest_latitude, dest_longitude),
+                    timeout=60
                 )
+                logger.info(route_data)
+                if not route_data:
+                    await self.send(text_data=json.dumps({"type": "error", "message": "Failed to get route data"}))
                 distance = route_data['distance']
                 duration = route_data['duration']
 
@@ -325,11 +345,10 @@ class TripRequestConsumer(AsyncWebsocketConsumer):
                 trip.accepted_fare = fare
                 await database_sync_to_async(trip.save)()
 
-                user_data = await self.get_user_details(self.user)
-
                 response_data = {
                     "type": "trip_created",
                     "trip_id": str(trip.id),
+                    "vehicle_type": vehicle_type,
                     "estimated_fare": fare,
                     "distance": distance,
                     "estimated_time": duration,
@@ -338,99 +357,162 @@ class TripRequestConsumer(AsyncWebsocketConsumer):
                 await self.send(text_data=json.dumps(response_data))
 
             except asyncio.TimeoutError:
-                logger.error("Timeout getting route data")
-                await self.send(text_data=json.dumps({"type": "error", "message": "Route calculation timed out"}))
+                logger.error("Timeout getting data")
+                await self.send(text_data=json.dumps({"type": "error", "message": "Timed out"}))
             except Exception as e:
                 logger.error(f"Error creating trip: {e}", exc_info=True)
                 await self.send(text_data=json.dumps({"type": "error", "message": "Failed to create trip"}))
 
-        elif action == "confirm_driver":
+        elif action == "confirm_trip":
             try:
                 trip_id = data.get("trip_id")
-                selected_driver_id = data.get("driver_id")
 
                 trip = await self.get_trip(trip_id)
 
-                driver = await self.get_driver(selected_driver_id)
+                if trip and trip.status == "pending":
+                    # Verify payment is completed (since user has already made payment)
+                    payment = await self.get_payment_for_trip(trip_id)           
 
-                if trip and driver and trip.status == "pending":
-                    if not driver.is_available or not driver.is_online:
-                        available_drivers = await self.get_available_drivers(trip)
+                    if not payment:
                         await self.send(text_data=json.dumps({
-                            "type": "select_new_driver",
-                            "message": "Driver is not available. Please select another driver.",
-                            "available_drivers": available_drivers
+                            "type": "error", 
+                            "message": "Payment not found. Please complete payment before confirming trip."
                         }))
-                    else:
+                        return
 
-                        payment = await self.get_payment_for_trip(trip_id)           
-
-                        if not payment:
-                            await self.send(text_data=json.dumps({"type": "error", "message": "Payment not found. Please complete payment before requesting a driver."}))
-                            return
-
-                        if payment.payment_method != "cash" and (payment.status != "success" or payment.amount != trip.accepted_fare or not trip.is_paid):
-                            await self.send(text_data=json.dumps({"type": "error", "message": "Card payment not completed. Please complete payment before requesting a driver."}))
-                            return
-
-                        trip_details = await self.get_trip_details(trip)
-                        driver_details = await self.get_driver_details(driver)
-                        trip_user = await sync_to_async(lambda: trip.user)()
-                        user_details = await self.get_user_details(trip_user)
-
+                    if payment.payment_method != "cash" and (payment.status != "success" or payment.amount != trip.accepted_fare or not trip.is_paid):
                         await self.send(text_data=json.dumps({
-                            "type": "awaiting_driver_response",
+                            "type": "error", 
+                            "message": "Card payment not completed. Please complete payment before confirming trip."
+                        }))
+                        return
+
+                    # Get all available drivers for this trip
+                    available_drivers = await self.get_available_drivers(trip)
+                    
+                    if not available_drivers:
+                        await self.send(text_data=json.dumps({
+                            "type": "error",
+                            "message": "No drivers available at the moment. Please try again later."
+                        }))
+                        return
+
+                    # Notify user that we're searching for a driver
+                    await self.send(text_data=json.dumps({
+                        "type": "searching_driver",
+                        "trip_id": str(trip.id),
+                        "status": "searching",
+                        "message": "Searching for available driver...",
+                        "payment_info": {
+                            "payment_method": payment.payment_method,
+                            "payment_status": payment.status,
+                            "amount": float(payment.amount),
+                            "currency": payment.currency,
+                        }
+                    }))
+
+                    # Start the automatic driver selection process
+                    await self.auto_select_driver(trip, available_drivers, payment)
+
+                else:
+                    await self.send(text_data=json.dumps({
+                        "type": "error", 
+                        "message": "Invalid trip or trip is not pending"
+                    }))
+
+            except asyncio.TimeoutError:
+                logger.error("Timeout waiting for payment info or driver response")
+                await self.send(text_data=json.dumps({
+                    "type": "error", 
+                    "message": "Operation timed out"
+                }))
+            except Exception as e:
+                logger.error(f"Error confirming trip: {e}", exc_info=True)
+                await self.send(text_data=json.dumps({
+                    "type": "error", 
+                    "message": "Failed to confirm trip"
+                }))
+
+    async def auto_select_driver(self, trip, available_drivers, payment):
+        """
+        Automatically prompt drivers one by one until one accepts the trip
+        """
+        trip_user = await sync_to_async(lambda: trip.user)()
+        user_details = await self.get_user_details(trip_user)
+        
+        for driver in available_drivers:
+            try:
+                # Check if driver is still available and online before sending request
+                current_driver = await self.get_driver(driver['id'])
+                if not current_driver or not current_driver.is_available or not current_driver.is_online:
+                    continue
+                
+                # Send trip request to driver
+                await self.channel_layer.group_send(
+                    f"driver_{driver['id']}",
+                    {
+                        "type": "trip_request_notification",
+                        "data": {
                             "trip_id": str(trip.id),
-                            "status": "pending",
-                            "driver_info": driver_details,
+                            "pickup": trip.pickup,
+                            "destination": trip.destination,
+                            "vehicle_type": trip.vehicle_type,
+                            "load_description": trip.load_description,
+                            "user_info": user_details,
                             "payment_info": {
                                 "payment_method": payment.payment_method,
                                 "payment_status": payment.status,
                                 "amount": float(payment.amount),
                                 "currency": payment.currency,
                             }
-                        }))
+                        }
+                    }
+                )
 
-                        # Send driver notification
-                        await self.channel_layer.group_send(
-                            f"driver_{selected_driver_id}",
-                            {
-                                "type": "trip_request_notification",
-                                "data": {
-                                    "trip_id": str(trip.id),
-                                    "pickup": trip.pickup,
-                                    "destination": trip.destination,
-                                    "vehicle_type": trip.vehicle_type,
-                                    "load_description": trip.load_description,
-                                    "user_info": user_details,
-                                    "payment_info": {
-                                        "payment_method": payment.payment_method,
-                                        "payment_status": payment.status,
-                                        "amount": float(payment.amount),
-                                        "currency": payment.currency,
-                                    }
-                                }
-                            }
-                        )
+                # Wait for driver response with timeout
+                driver_accepted = await self.await_driver_response(
+                    trip_id=str(trip.id), 
+                    selected_driver_id=driver['id'],
+                    wait_time=30  # 30 seconds timeout per driver
+                )
 
-                        await self.await_driver_response(trip_id=str(trip.id), selected_driver_id=selected_driver_id)
-                else:
-                    await self.send(text_data=json.dumps({"error": "Invalid trip or driver"}))
+                if driver_accepted:
+                    # Driver accepted the trip
+                    driver_details = await self.get_driver_details(current_driver)
+                    
+                    await self.send(text_data=json.dumps({
+                        "type": "driver_assigned",
+                        "trip_id": str(trip.id),
+                        "status": "driver_assigned",
+                        "message": "Driver found and assigned to your trip!",
+                        "driver_info": driver_details,
+                        "payment_info": {
+                            "payment_method": payment.payment_method,
+                            "payment_status": payment.status,
+                            "amount": float(payment.amount),
+                            "currency": payment.currency,
+                        }
+                    }))
+                    return  # Exit the loop as we found a driver
 
-            except asyncio.TimeoutError:
-                logger.error("Timeout waiting for payment info or driver response")
-                await self.send(text_data=json.dumps({"error": "Operation timed out"}))
+                # Driver declined or didn't respond, continue to next driver
+                
             except Exception as e:
-                logger.error(f"Error confirming driver: {e}", exc_info=True)
-                await self.send(text_data=json.dumps({"error": "Failed to confirm driver"}))
-        else:
-            await self.send(text_data=json.dumps({"error": f"Unknown action: {action}"}))
+                logger.error(f"Error requesting driver {driver['id']}: {e}")
+                continue
 
+        # If we reach here, no driver accepted the trip
+        await self.send(text_data=json.dumps({
+            "type": "no_driver_found",
+            "trip_id": str(trip.id),
+            "status": "no_driver_available",
+            "message": "No drivers are available to accept your trip at the moment. Please try again later."
+        }))
 
     async def await_driver_response(self, trip_id: str, selected_driver_id: str, wait_time: int = 30):
         """
         Waits for a driver response for the given trip within wait_time seconds.
-        If the driver does not respond, resets the trip and notifies the client.
+        Returns True if driver accepted, False if declined/no response.
         """
         try:
             # Wait asynchronously for the driver's response
@@ -439,31 +521,31 @@ class TripRequestConsumer(AsyncWebsocketConsumer):
             # Re-fetch the trip to get the updated status
             trip = await self.get_trip(trip_id)
 
-            # If still pending after wait_time seconds, handle no-response
-            if trip.status == "pending":
-                # Reset the assigned driver
+            # Check if trip status changed (driver responded)
+            if trip.status == "accepted":
+                logger.info(f"Driver {selected_driver_id} accepted trip {trip_id}")
+                return True
+            elif trip.status == "declined":
+                logger.info(f"Driver {selected_driver_id} declined trip {trip_id}")
+                # Reset trip status to pending for next driver attempt
+                trip.status = "pending"
                 trip.driver = None
                 await self.save_trip(trip)
-
-                # Get a fresh list of available drivers
-                available_drivers = await self.get_available_drivers(trip)
-
-                # Notify the client (rider) that the driver didn't respond
-                available_drivers = await self.get_available_drivers(trip)
-                await self.send(text_data=json.dumps({
-                    "type": "select_new_driver",
-                    "message": "Driver is not available. Please select another driver.",
-                    "available_drivers": available_drivers
-                }))
-
-                logger.info(f"Driver {selected_driver_id} did not respond for trip {trip_id}. Trip reset.")
+                return False
             else:
-                logger.info(f"Driver {selected_driver_id} responded for trip {trip_id} with status '{trip.status}'.")
+                # Still pending - driver didn't respond
+                logger.info(f"Driver {selected_driver_id} did not respond for trip {trip_id}")
+                # Reset the assigned driver for next attempt
+                trip.driver = None
+                await self.save_trip(trip)
+                return False
 
         except asyncio.CancelledError:
             logger.warning(f"Await driver response task cancelled for trip {trip_id}")
+            return False
         except Exception as e:
             logger.error(f"Error in await_driver_response for trip {trip_id}: {e}", exc_info=True)
+            return False
 
     async def trip_request_notification(self, event):
         await self.send(text_data=json.dumps({
@@ -507,7 +589,7 @@ class TripRequestConsumer(AsyncWebsocketConsumer):
     def get_user_details(self, user):
         return {
             "id": str(user.id),
-            "name": f"{user.first_name} {user.last_name}",
+            "name": f"{user.full_name}",
             "phone": str(user.phone_number) if user.phone_number else None,
         }
 
@@ -981,7 +1063,7 @@ class UserGetAvailableDrivers(AsyncWebsocketConsumer):
             try:
                 # Now we can call the async function directly
                 route_data = await asyncio.wait_for(
-                    get_route_data(user_latitude, user_longitude, driver['latitude'], driver['longitude']),
+                    get_google_route_data(user_latitude, user_longitude, driver['latitude'], driver['longitude']),
                     timeout=20  # 5-second timeout per request
                 )
                 nearest_drivers.append({
@@ -1014,7 +1096,7 @@ class UserGetAvailableDrivers(AsyncWebsocketConsumer):
                 try:
                     # Now we can call the async function directly
                     route_data = await asyncio.wait_for(
-                        get_route_data(user_latitude, user_longitude, driver['latitude'], driver['longitude']),
+                        get_google_route_data(user_latitude, user_longitude, driver['latitude'], driver['longitude']),
                         timeout=20 
                     )
                     nearest_drivers.append({

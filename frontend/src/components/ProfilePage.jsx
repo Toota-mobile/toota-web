@@ -1,11 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaLock, FaEye, FaEyeSlash, FaEdit, FaSave } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
+import MD5 from "crypto-js/md5";
+
 
 const ProfilePage = () => {
+  const email = localStorage.getItem("email")
+  const hash = email.trim().toLowerCase()
+    ? MD5(email.trim().toLowerCase()).toString()
+    : "";
+  const gravatarUrl = `https://www.gravatar.com/avatar/${hash}?d=404&s=40`;
+
+  const [imgError, setImgError] = useState(false);
+
+  // reset on email change
+  useEffect(() => setImgError(false), [email]);
   const [editMode, setEditMode] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  
+
   // User data state
   const [user, setUser] = useState({
     fullName: 'Sarah Johnson',
@@ -37,7 +49,7 @@ const ProfilePage = () => {
     <div className="flex items-center space-x-4">
       <button 
         onClick={() => window.history.back()} 
-        className="text-gray-600 hover:text-orange-500 transition-colors"
+        className="text-gray-600 hover:text-orange-500 transition-colors cursor-pointer"
       >
         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -52,14 +64,6 @@ const ProfilePage = () => {
         <span className="text-2xl font-bold text-orange-500">Toota</span>
       </Link>
     </div>
-    <nav className="flex items-center space-x-6">
-      <Link to="/" className="text-gray-600 hover:text-orange-500 font-medium transition-colors">
-        Home
-      </Link>
-      <Link to="/about" className="text-gray-600 hover:text-orange-500 font-medium transition-colors">
-        About
-      </Link>
-    </nav>
   </div>
 </header>
       {/* Main Content */}
@@ -70,7 +74,7 @@ const ProfilePage = () => {
             <div className="flex items-center">
               <div className="w-20 h-20 rounded-full bg-white flex items-center justify-center mr-6">
                 <span className="text-orange-500 text-3xl font-bold">
-                  {user.fullName.split(' ').map(n => n[0]).join('')}
+                  {user.fullName.split(' ').map(n => n[0].toUpperCase()).join('')}
                 </span>
               </div>
               <div>
@@ -88,7 +92,7 @@ const ProfilePage = () => {
                 <FaUser className="mr-2 text-orange-500" />
                 Personal Information
               </h3>
-              
+
               <div className="space-y-4">
                 <div className="form-group">
                   <label className="block text-gray-700 mb-2">Full Name</label>
@@ -194,7 +198,7 @@ const ProfilePage = () => {
             {/* Delivery Preferences */}
             <div className="mb-8">
               <h3 className="text-xl font-semibold mb-4">Delivery Preferences</h3>
-              
+
               <div className="space-y-4">
                 <div className="form-group">
                   <label className="block text-gray-700 mb-2">Preferred Payment Method</label>

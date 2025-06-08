@@ -37,7 +37,7 @@ const EmailVerification = () => {
 
   const verifyPin = async (code) => {
     try {
-      const email = localStorage.getItem("email");
+      const email = localStorage.getItem("email", none);
       const response = await fetch("https://toota-web.onrender.com/auth/verify-email/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -49,7 +49,7 @@ const EmailVerification = () => {
         throw new Error(data.message || "Verification failed");
       }
 
-      console.log("Verification successful", data);
+      // console.log("Verification successful", data);
       navigate("/signin/individual");
     } catch (error) {
       alert(error.message || "Something went wrong.");

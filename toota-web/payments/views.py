@@ -108,6 +108,7 @@ class PaymentView(APIView):
 
         trip = get_object_or_404(Trip, id=trip_id)
         amount = trip.accepted_fare
+        logger.info(f"accepted fare: {amount}")
         if amount is None:
             return Response({"error": "Trip has no accepted fare set."}, status=status.HTTP_400_BAD_REQUEST)
         transaction_id = str(uuid.uuid4())
@@ -125,7 +126,7 @@ class PaymentView(APIView):
             protocol = "https" if request.is_secure() else "http"
             base_url = f"{protocol}://{host}"
 
-            full_name = f"{request.user.first_name} {request.user.last_name}".strip() or request.user.email
+            full_name = request.user.full_name or request.user.email
 
 
             PAYSTACK_SECRET_KEY = os.getenv("PAYSTACK_SECRET_KEY")
@@ -134,7 +135,7 @@ class PaymentView(APIView):
             FLUTTERWAVE_SECRET_KEY = os.getenv("FLUTTERWAVE_SECRET_KEY")
 
 
-            if location == "NG":
+            if location == "ZA":
                 # Flutterwave
                 url = f"{FLUTTERWAVE_BASE_URL}/payments"
                 payment.gateway = "flutterwave"
@@ -173,8 +174,8 @@ class PaymentView(APIView):
 
                 payment_data = {
                     "email": request.user.email,
-                    "amount": int(amount) * 100,  # Convert to kobo
-                    "callback_url": f"{base_url}/payment/verify/",
+                    "amount": round(float(amount) * 100),  # Convert to kobo
+                    "callback_url": "http://localhost:3000/verify_payment",
                     "reference": transaction_id,
                     "metadata": {
                         "trip_id": str(trip_id),
@@ -193,7 +194,7 @@ class PaymentView(APIView):
 
 
                 # Handle response based on gateway
-                if location == "NG":
+                if location == "ZA":
                     if response.status_code == 200 and res_data.get("status") in ["success", True]:
                         return Response({
                             "message": "Payment initialized successfully",
@@ -330,11 +331,15 @@ class VerifyPaymentView(APIView):
             if response.status_code == 200 and res_data.get("status") in ["success", True]:
                 payment_data = res_data["data"]
 
-                if payment_data.get("status") in ["successful", "success"] and float(payment_data.get('amount')) == float(payment.amount):
+                if payment.gateway == "flutterwave":
+                    amount_paid = float(payment_data.get("charged_amount", 0))
+                elif payment.gateway == "paystack":
+                    amount_paid = float(payment_data.get("amount", 0)) / 100
+                if payment_data.get("status") in ["successful", "success"] and amount_paid == float(payment.amount):
                     payment.status = "success"
                     trip.is_paid = True
                     trip.save()
-                    payment.payment_reference = str(transaction_id)
+                    payment.payment_reference = str(payment_data.get("id", ""))
                     payment.save()
                     return Response({
                         "status": "success",
@@ -416,7 +421,9 @@ class VerifyPaymentView(APIView):
         """
         Manual Payment Verification by transaction_id
         """
+        logger.info("Manual Payment Verification Request Received")
         transaction_id = request.data.get('transaction_id')
+        logger.info(transaction_id)
 
         if not transaction_id:
             return Response({"error": "transaction_id is required"}, status=status.HTTP_400_BAD_REQUEST)
@@ -435,7 +442,7 @@ class VerifyPaymentView(APIView):
         if payment.status == 'success':
             return Response({"message": "Payment already verified as successful"}, status=status.HTTP_200_OK)
 
-        payment_gateway = payment.gateway  # Assuming you store the gateway used ("flutterwave" or "paystack")
+        payment_gateway = payment.gateway  
 
         if payment_gateway == "flutterwave":
             FLUTTERWAVE_BASE_URL = os.getenv("FLUTTERWAVE_BASE_URL")
@@ -461,12 +468,18 @@ class VerifyPaymentView(APIView):
             res_data = response.json()
 
             if response.status_code == 200 and res_data.get("status") in ["success", True]:
+                # logger.info("i was here 1")
+                payment_status = res_data["data"]["status"]
+                # logger.info(f"Paystack payment status: {payment_status}")
+                # logger.info("i was here 2")
+                payment_data = res_data["data"]
                 if payment_gateway == "flutterwave":
-                    payment_status = res_data["data"]["status"]
-                else:  # Paystack
-                    payment_status = res_data["data"]["status"]
-
-                if payment_status in ["successful", "success"] and float(payment_data.get('amount')) == float(payment.amount):
+                    amount_paid = float(payment_data.get("charged_amount", 0))
+                elif payment_gateway == "paystack":
+                    amount_paid = float(payment_data.get("amount", 0)) / 100
+                # logger.info(f"Amount paid: {amount_paid}, Expected: {payment.amount}")
+                if payment_status in ["successful", "success"] and amount_paid == float(payment.amount):
+                    # logger.info("i was here 3")
                     payment.status = "success"
                     payment.payment_reference = str(res_data["data"].get("id", ""))
                     trip.is_paid = True

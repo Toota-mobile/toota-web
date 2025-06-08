@@ -209,13 +209,13 @@
 
         <div class="trip-card">
             <div class="trip-details">
-                <div class="trip-id">Trip ID: 1177dc3a-9159-450e-916e-c599006e27ca</div>
+                <div class="trip-id">Trip ID: 04773721-ff6f-4899-b317-cbb0d3923111</div>
                 <div class="trip-route">Mall → Home</div>
-                <div class="trip-fare">₦381.60</div>
+                <div class="trip-fare">₦4205.7</div>
                 <div class="trip-status">Completed</div>
             </div>
             <div class="trip-actions">
-                <button class="pay-btn" data-trip-id="1177dc3a-9159-450e-916e-c599006e27ca" data-fare="381.60">Pay Now</button>
+                <button class="pay-btn" data-trip-id="04773721-ff6f-4899-b317-cbb0d3923111" data-fare="4205.7">Pay Now</button>
             </div>
         </div>
 
@@ -297,15 +297,15 @@
     
             // Function to send payment request to backend
             function fetchPaymentLink(paymentData) {
-                const authToken = localStorage.getItem('authToken'); // Assuming you store it here
-    
+                // const authToken = localStorage.getItem('authToken'); // Assuming you store it here
+                const authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ5MjIxNzM3LCJpYXQiOjE3NDkyMTgxMzcsImp0aSI6ImRmNWQ4YWVmZjE5MDQ1MTk4ZDUyODcwZmUwMzAyZGVkIiwidXNlcl9pZCI6IjhlZGNlNTY0LWYwNjgtNDZiZS04NmFiLTM0YzNkYmFiYTg1OSJ9.ucY2DPK-Xay4exdITLecD6uYpnAYQv4aS53lYssD6hI";
                 if (!authToken) {
                     alert('Authentication token not found. Please login again.');
                     window.location.href = 'login.html';
                     return;
                 }
     
-                fetch('http://localhost:8000/payment/', {
+                fetch(`http://localhost:8000/payment/?token=${authToken}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

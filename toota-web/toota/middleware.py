@@ -1,9 +1,9 @@
-# toota/middleware.py
 import logging
 from django.contrib.auth.models import AnonymousUser
 from rest_framework_simplejwt.tokens import AccessToken
 from channels.db import database_sync_to_async
 from authentication.models import User, Driver
+from urllib.parse import parse_qs
 
 logger = logging.getLogger(__name__)
 
@@ -34,20 +34,36 @@ class JWTMiddleware:
 
     async def __call__(self, scope, receive, send):
         logger.info("JWT Middleware: Starting")
-        headers = dict(scope["headers"])
-        if b"authorization" in headers:
-            auth_header = headers[b"authorization"].decode()
-            if auth_header.startswith("Bearer "):
-                token = auth_header.split("Bearer ")[1]
-                scope["user"] = await get_user_or_driver_from_jwt(token)
-            else:
-                scope["user"] = AnonymousUser()
-                logger.warning("JWT Middleware: No Bearer token in Authorization header")
+        query_string = scope.get("query_string", b"").decode()
+        query_params = parse_qs(query_string)
+        token_list = query_params.get("token", [])
+
+        
+        if token_list:
+            token = token_list[0]
+            try:
+                user = await get_user_or_driver_from_jwt(token)
+                if user is None or user.is_anonymous:
+                    logger.warning("JWT Middleware: Invalid token or anonymous user")
+                    await self.reject_connection(send)
+                    return
+
+                scope["user"] = user
+                logger.info("JWT Middleware: Token extracted and user authenticated")
+            except Exception as e:
+                logger.error(f"JWT Middleware: Token validation error - {str(e)}")
+                await self.reject_connection(send)
+                return
         else:
-            scope["user"] = AnonymousUser()
-            logger.warning("JWT Middleware: No Authorization header provided")
+            logger.warning("JWT Middleware: No token found in query string")
+            await self.reject_connection(send)
+            return
 
         logger.info("JWT Middleware: Calling inner application")
-        result = await self.inner(scope, receive, send)
-        logger.info("JWT Middleware: Inner application completed")
-        return result
+        return await self.inner(scope, receive, send)
+
+    async def reject_connection(self, send):
+        await send({
+            "type": "websocket.close",
+            "code": 4001  # Custom error code
+        })

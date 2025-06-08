@@ -101,13 +101,15 @@ class Driver(AbstractCustomUser):
     rating_count = models.PositiveIntegerField(default=0)
     
     VEHICLE_CHOICES = [
-        ('MotorBike', 'MotorBike'),
-        ('1 ton Truck', '1 ton Truck'),
-        ('1.5 ton Truck', '1.5 ton Truck'),
-        ('2 ton Truck', '2 ton Truck'),
-        ('4 ton Truck', '4 ton Truck'),
-        ('Bakkie', 'Bakkie'),
-        ('8 ton Truck', '8 ton Truck'),
+        ('motorBike', 'MotorBike'),
+        ('1 ton truck', '1 ton Truck'),
+        ('1.5 ton truck', '1.5 ton Truck'),
+        ('2 ton truck', '2 ton Truck'),
+        ('4 ton truck', '4 ton Truck'),
+        ('bakkie', 'Bakkie'),
+        ('car', 'car'),
+        ('scooter', 'scooter'),
+        ('8 ton truck', '8 ton Truck'),
     ]
     # Added load capacity choices
     LOAD_CAPACITY_CHOICES = [

@@ -40,7 +40,7 @@ class BaseSignupSerializer(serializers.ModelSerializer):
         Validate email field to ensure it's either not in use or if in use, it is active.
         """
         user = self.Meta.model.objects.filter(email=value).first()
-        print("i was in the validate_email method")
+        # print("i was in the validate_email method")
         if user:
             if user.is_active:  # Check if the user is active
                 raise serializers.ValidationError("Email already in use.")

@@ -7,6 +7,8 @@ load_dotenv()
 import aiohttp
 import asyncio
 import logging
+import googlemaps
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -38,44 +40,31 @@ def find_nearest_drivers(pickup_lat, pickup_lon, vehicle_type, limit=20):
     # Return only serialized driver data (no distance)
     return [FindDriversSerializer(driver).data for driver, _ in sorted_drivers]
 
-async def get_route_data(pickup_lat, pickup_lon, dest_lat, dest_lon):
-    """
-    Call OSRM's public API to calculate route data between two coordinates using aiohttp.
-    Returns a dict with 'distance_km' (rounded to 2 decimals) and 'duration' (formatted as 'X min' or 'X sec').
-    """
-    url = f"http://router.project-osrm.org/route/v1/driving/{pickup_lon},{pickup_lat};{dest_lon},{dest_lat}?overview=false"
+GOOGLE_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
+
+async def get_google_route_data(pickup_lat, pickup_lon, dest_lat, dest_lon):
+    url = (
+        "https://maps.googleapis.com/maps/api/directions/json"
+        f"?origin={pickup_lat},{pickup_lon}"
+        f"&destination={dest_lat},{dest_lon}"
+        f"&mode=driving&key={GOOGLE_API_KEY}"
+    )
 
     try:
-        # Use aiohttp instead of requests for async HTTP requests
         async with aiohttp.ClientSession() as session:
-            async with session.get(url, timeout=5) as response:  # 5-second timeout
+            async with session.get(url, timeout=5) as response:
                 data = await response.json()
 
-                if data.get("code") == "Ok" and "routes" in data and len(data["routes"]) > 0:
-                    route = data["routes"][0]
+                if data.get("status") == "OK" and data.get("routes"):
+                    leg = data["routes"][0]["legs"][0]
+                    distance_km = round(leg["distance"]["value"] / 1000, 2)
+                    duration_text = leg["duration"]["text"]
 
-                    distance_km = round(float(route["distance"]) / 1000.0, 2)
-                    duration_sec = float(route["duration"])
-                    
-                    # Format duration to be human-readable
-                    if duration_sec < 60:
-                        duration_str = f"{int(duration_sec)} sec"
-                    elif duration_sec < 3600:
-                        duration_str = f"{int(duration_sec // 60)} min"
-                    else:
-                        hours = int(duration_sec // 3600)
-                        minutes = int((duration_sec % 3600) // 60)
-                        seconds = int(duration_sec % 60)
-                        duration_str = f"{hours} hour{'s' if hours > 1 else ''} {minutes} min"
-                        if seconds > 0:
-                            duration_str += f" {seconds} sec"
+                    return {"distance": distance_km, "duration": duration_text}
 
-                    return {"distance": distance_km, "duration": duration_str}
-
-    except (aiohttp.ClientError, asyncio.TimeoutError) as e:
-        logger.error(f"Error calling OSRM API: {e}")
     except Exception as e:
-        logger.error(f"Unexpected error calling OSRM API: {e}")
+        logger.error(f"Google Directions API failed: {e}")
+
 
 def calculate_easter(year):
     """
@@ -134,3 +123,40 @@ def convert_decimals(obj):
     elif isinstance(obj, decimal.Decimal):
         return float(obj)
     return obj
+
+
+async def get_coordinates(address, api_key=os.getenv("GOOGLE_MAPS_API_KEY")):
+    url = "https://maps.googleapis.com/maps/api/geocode/json"
+    params = {
+        "address": address,
+        "key": api_key
+    }
+
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, params=params, timeout=5) as response:
+                data = await response.json()
+
+                if data['status'] == 'OK' and data['results']:
+                    location = data['results'][0]['geometry']['location']
+                    return location['lat'], location['lng']
+                else:
+                    return None, None
+    except (aiohttp.ClientError, asyncio.TimeoutError) as e:
+        print(f"Geocode error: {e}")
+        return None, None
+
+
+def reverse_geocode(lat, lng, api_key=os.getenv("GOOGLE_MAPS_API_KEY")):
+    url = "https://maps.googleapis.com/maps/api/geocode/json"
+    params = {
+        "latlng": f"{lat},{lng}",
+        "key": api_key
+    }
+    response = requests.get(url, params=params)
+    data = response.json()
+
+    if data['status'] == 'OK':
+        return data['results'][0]['formatted_address']
+    else:
+        return None

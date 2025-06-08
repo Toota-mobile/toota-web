@@ -10,6 +10,7 @@ class Trip(models.Model):
     class StatusChoices(models.TextChoices):
         PENDING = "pending", "Pending"
         ACCEPTED = "accepted", "Accepted"
+        DECLINED = "declined", "Declined"
         PICKEDUP = "picked up", "Picked up"
         ARRIVED_AT_PICKUP = "arrived at pickup", "Arrived at pickup"
         ARRIVED_AT_DESTINATION = "arrived at destination", "Arrived at destination"

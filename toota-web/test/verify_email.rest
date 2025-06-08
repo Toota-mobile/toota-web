@@ -2,8 +2,8 @@ post http://localhost:8000/auth/verify-email/
 Content-Type: application/json
 
 {
-    "email": "oladevcoolbooks@gmail.com",
-    "otp": "3651"
+    "email": "fyidweb3lord@gmail.com",
+    "otp": "4559"
 }
 
 # post http://localhost:8000/auth/resend-code/

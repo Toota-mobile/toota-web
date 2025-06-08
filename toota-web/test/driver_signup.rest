@@ -3,5 +3,7 @@ Content-Type: application/json
 
 {
     "email": "fyidweb3lord@gmail.com",
+    "phone_number": "+234 7049906335",
+    "full_name": "Mojibola Olalekan",
     "password": "driver123"
 }

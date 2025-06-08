@@ -62,7 +62,7 @@ const IndividualSignup = () => {
     // 2) Prepare payload
     const submissionData = { ...formData };
     delete submissionData.confirmPassword;
-    localStorage.setItem("email", formData.email);
+    if (formData.email) { localStorage.setItem("email", formData.email); }
 
     try {
       // 3) Hit signup endpoint
@@ -90,10 +90,10 @@ const IndividualSignup = () => {
       }
 
       // 6) Success!
-      console.log('Signup successful:', data);
+      // console.log('Signup successful:', data);
       navigate("/verify-email");
     } catch (err) {
-      console.error('Signup error:', err.message);
+      // console.error('Signup error:', err.message);
 
       // 7) Redirect on verification request
       if (err.message.includes('Please verify your email')) {

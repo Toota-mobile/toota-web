@@ -1,0 +1,6 @@
+post http://localhost:8000/auth/resend-code/
+Content-Type: application/json
+
+{
+  "email": "lekan4jesu@gmail.com"
+}

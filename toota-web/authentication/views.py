@@ -41,8 +41,8 @@ class BaseSignupView(APIView):
     success_message = "Signup successful. Check your email for OTP."
 
     def post(self, request):
-        request.data['full_name'] = request.data.pop('fullName', None)
-        request.data['phone_number'] = request.data.pop('phoneNumber', None)
+        request.data['full_name'] = request.data.pop('fullName', None) or request.data.pop('full_name', None)
+        request.data['phone_number'] = request.data.pop('phoneNumber', None) or request.data.pop('phone_number', None)
 
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
@@ -495,6 +495,7 @@ class CommonVerifyEmailView(APIView):
         # OTP is valid; activate the user and remove the OTP record.
 
         user_obj.is_active = True
+        print(f"this is user active status: {user_obj.is_active}")
         otp_instance.delete()
         user_obj.save()
         return Response({"message": "Email verified successfully."},
