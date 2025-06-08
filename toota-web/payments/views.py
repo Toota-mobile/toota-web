@@ -175,7 +175,7 @@ class PaymentView(APIView):
                 payment_data = {
                     "email": request.user.email,
                     "amount": round(float(amount) * 100),  # Convert to kobo
-                    "callback_url": "http://localhost:3000/verify_payment",
+                    "callback_url": "https://toota-web-pages.onrender.com/verify_payment",
                     "reference": transaction_id,
                     "metadata": {
                         "trip_id": str(trip_id),

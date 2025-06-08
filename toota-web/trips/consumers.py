@@ -288,23 +288,16 @@ class TripRequestConsumer(AsyncWebsocketConsumer):
                     await self.send(text_data=json.dumps({
                         'error': 'Destination address is required'
                     }))
-                # print(f"Pickup: {pickup}, Destination: {destination}")
                 pickup_latitude, pickup_longitude = await asyncio.wait_for(
                     get_coordinates(pickup), timeout=60
                 )
-                # print(f"Pickup coordinates: {pickup_latitude}, {pickup_longitude}")
-                # get_pick = reverse_geocode(pickup_latitude, pickup_longitude)
-                # print(f"Pickup reverse geocode: {get_pick}")
                 if not pickup_latitude or not pickup_longitude:
                     await self.send(text_data=json.dumps({"type": "error", "message": "Invalid pickup location"}))
                     return
 
                 dest_latitude, dest_longitude = await asyncio.wait_for(
-                    get_coordinates(destination), timeout=60
+                    get_coordinates(destination), timeout=15
                 )
-                # print(f"Destination coordinates: {dest_latitude}, {dest_longitude}")
-                # get_dest = reverse_geocode(dest_latitude, dest_longitude)
-                # print(f"Destination reverse geocode: {get_dest}")
                 if not dest_latitude or not dest_longitude:
                     await self.send(text_data=json.dumps({"type": "error", "message": "Invalid destination location"}))
                     return
@@ -312,7 +305,7 @@ class TripRequestConsumer(AsyncWebsocketConsumer):
 
                 route_data = await asyncio.wait_for(
                     get_google_route_data(pickup_latitude, pickup_longitude, dest_latitude, dest_longitude),
-                    timeout=60
+                    timeout=15
                 )
                 logger.info(route_data)
                 if not route_data:
