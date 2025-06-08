@@ -278,6 +278,16 @@ class TripRequestConsumer(AsyncWebsocketConsumer):
                 vehicle_type = data.get("vehicle_type")
                 pickup = data.get("pickup")
                 destination = data.get("destination")
+                if not pickup:
+                    await self.send(text_data=json.dumps({
+                        'error': 'Pickup address is required'
+                    }))
+                    return
+                
+                if not destination:
+                    await self.send(text_data=json.dumps({
+                        'error': 'Destination address is required'
+                    }))
                 # print(f"Pickup: {pickup}, Destination: {destination}")
                 pickup_latitude, pickup_longitude = await asyncio.wait_for(
                     get_coordinates(pickup), timeout=60

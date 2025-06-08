@@ -127,6 +127,8 @@ def convert_decimals(obj):
 
 async def get_coordinates(address, api_key=os.getenv("GOOGLE_MAPS_API_KEY")):
     url = "https://maps.googleapis.com/maps/api/geocode/json"
+    if not address or not address.strip():
+       raise ValueError("Address cannot be empty")
     params = {
         "address": address,
         "key": api_key
