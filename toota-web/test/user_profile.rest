@@ -1,8 +1,7 @@
-post http://localhost:8000/auth/login/user/
+PATCH http://localhost:8000/auth/profile/user/
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ5NTEyMjIwLCJpYXQiOjE3NDk1MDg2MjAsImp0aSI6Ijk5ZGZiYzU3N2YzZjQ2OGI4MjhhYjE3Mzk3NmM1YTdlIiwidXNlcl9pZCI6IjhlZGNlNTY0LWYwNjgtNDZiZS04NmFiLTM0YzNkYmFiYTg1OSJ9.8cia9idriPKpdq-DoLWTujbIY4UKUNlH5HjORkDRMEg
 
 {
-    "email": "lekanmojibola@gmail.com",
-    "password": "oladev123"       
+    "phone_number": "+234 9067914517"
 }

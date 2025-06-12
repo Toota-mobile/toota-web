@@ -1,12 +1,14 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Navbar from "./Navbar";
 
 const EmailVerification = () => {
   const [pin, setPin] = useState(["", "", "", ""]);
+  const location = useLocation();
   const [resendMessage, setResendMessage] = useState("");
   const inputRefs = useRef([]);
   const navigate = useNavigate();
+  const [user, setUser] = useState(location.state?.user || "user");
 
   // Automatically focus the next input
   const handleChange = (index, value) => {
@@ -37,11 +39,11 @@ const EmailVerification = () => {
 
   const verifyPin = async (code) => {
     try {
-      const email = localStorage.getItem("email", none);
+      const email = localStorage.getItem("email"); // Fixed: removed 'none'
       const response = await fetch("https://toota-web.onrender.com/auth/verify-email/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, otp:code }),
+        body: JSON.stringify({ email, otp: code }),
       });
 
       const data = await response.json();
@@ -50,7 +52,11 @@ const EmailVerification = () => {
       }
 
       // console.log("Verification successful", data);
-      navigate("/signin/individual");
+      if (user === "user"){
+        navigate("/signin/individual");
+      }else {
+        navigate("signin/driver");
+      }
     } catch (error) {
       alert(error.message || "Something went wrong.");
       setPin(["", "", "", ""]);
@@ -107,7 +113,7 @@ const EmailVerification = () => {
             <button
               type="button"
               onClick={handleResend}
-              className="text-sm text-orange-500 hover:underline"
+              className="text-sm text-orange-500 hover:underline cursor-pointer"
             >
               Resend verification code
             </button>

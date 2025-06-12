@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaUserPlus, FaSignInAlt, FaArrowLeft } from "react-icons/fa";
+import { ChevronDown } from "lucide-react";
 import Navbar from "./Navbar"; 
 
 const IndividualSignup = () => {
   const navigate = useNavigate(); // Initialize navigate for redirection
+  const dropdownRef = useRef(null);
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -14,9 +16,49 @@ const IndividualSignup = () => {
     confirmPassword: "" // Added confirm password field
   });
 
+  // Phone number specific state
+  const [selectedCountry, setSelectedCountry] = useState({
+    code: '+27',
+    flag: '🇿🇦',
+    name: 'South Africa'
+  });
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  const countries = [
+    { code: '+27', flag: '🇿🇦', name: 'South Africa' },
+    { code: '+234', flag: '🇳🇬', name: 'Nigeria' },
+    { code: '+254', flag: '🇰🇪', name: 'Kenya' },
+    { code: '+233', flag: '🇬🇭', name: 'Ghana' },
+    { code: '+251', flag: '🇪🇹', name: 'Ethiopia' }
+  ];
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [passwordMatch, setPasswordMatch] = useState(null);
+
+  // Handle click outside to close dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  // Update formData whenever phone number or country changes
+  useEffect(() => {
+    const fullPhoneNumber = phoneNumber ? `${selectedCountry.code}${phoneNumber}` : '';
+    setFormData(prevState => ({
+      ...prevState,
+      phoneNumber: fullPhoneNumber
+    }));
+  }, [phoneNumber, selectedCountry]);
 
   // Handle form input changes
   const handleChange = (e) => {
@@ -33,6 +75,27 @@ const IndividualSignup = () => {
         name === 'confirmPassword' ? value : formData.confirmPassword
       );
     }
+  };
+
+  // Handle phone number input changes
+  const handlePhoneChange = (e) => {
+    // Remove non-numeric characters except spaces and dashes
+    const value = e.target.value.replace(/[^\d\s-]/g, '');
+    setPhoneNumber(value);
+  };
+
+  // Handle country selection
+  const handleCountrySelect = (country) => {
+    setSelectedCountry(country);
+    setIsDropdownOpen(false);
+  };
+
+  // Toggle dropdown
+  const toggleDropdown = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDropdownOpen(!isDropdownOpen);
+    console.log('Dropdown toggled:', !isDropdownOpen); // Debug log
   };
 
   // Check if passwords match
@@ -77,7 +140,7 @@ const IndividualSignup = () => {
 
       // 5) If backend returned a non-2xx, extract all messages and throw
       if (!response.ok) {
-        // collect top‐level “error” plus any field arrays
+        // collect top‐level "error" plus any field arrays
         const messages = [];
         if (data.error) messages.push(data.error);
         Object.values(data).forEach(val => {
@@ -91,7 +154,11 @@ const IndividualSignup = () => {
 
       // 6) Success!
       // console.log('Signup successful:', data);
-      navigate("/verify-email");
+      navigate("/verify-email", {
+        state: {
+          user: "user",
+        },
+      });
     } catch (err) {
       // console.error('Signup error:', err.message);
 
@@ -139,7 +206,7 @@ const IndividualSignup = () => {
                 type="text"
                 value={formData.fullName}
                 onChange={handleChange}
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400"
+                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-transparent focus:ring-2 focus:ring-orange-400"
                 placeholder="Enter your full name"
                 required
               />
@@ -159,18 +226,79 @@ const IndividualSignup = () => {
               />
             </div>
 
-            <div>
-              <label htmlFor="phoneNumber" className="block text-gray-700 font-semibold mb-1">Phone Number</label>
-              <input
-                id="phoneNumber"
-                name="phoneNumber"
-                type="tel"
-                value={formData.phoneNumber}
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400"
-                placeholder="Enter your phone number"
-                required
-              />
+            {/* Updated Phone Number Field */}
+            <div className="relative">
+              <label className="block text-gray-700 font-semibold mb-1">Phone Number</label>
+              <div className="flex border border-gray-300 rounded-lg overflow-visible focus-within:ring-2 focus-within:ring-orange-400 focus-within:border-orange-400">
+                {/* Country Code Dropdown */}
+                <div className="relative" ref={dropdownRef}>
+                  <button
+                    type="button"
+                    onClick={toggleDropdown}
+                    className="flex items-center px-3 py-2 bg-gray-50 border-r border-gray-300 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition-colors h-full whitespace-nowrap"
+                  >
+                    <span className="text-lg mr-2">{selectedCountry.flag}</span>
+                    <span className="text-sm font-medium text-gray-700 mr-1">
+                      {selectedCountry.code}
+                    </span>
+                    <ChevronDown 
+                      className={`w-4 h-4 text-gray-500 transition-transform ${
+                        isDropdownOpen ? 'rotate-180' : ''
+                      }`} 
+                    />
+                  </button>
+
+                  {/* Dropdown Menu */}
+                  {isDropdownOpen && (
+                    <div 
+                      className="absolute top-full left-0 z-[9999] bg-white border border-gray-300 rounded-lg shadow-2xl mt-1 min-w-[160px] max-h-60 overflow-y-auto"
+                      style={{
+                        position: 'absolute',
+                        top: '100%',
+                        left: '0',
+                        zIndex: 9999,
+                        backgroundColor: 'white',
+                        border: '1px solid #d1d5db',
+                        borderRadius: '0.5rem',
+                        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+                        marginTop: '0.25rem',
+                        minWidth: '160px'
+                      }}
+                    >
+                      {countries.map((country) => (
+                        <button
+                          key={country.code}
+                          type="button"
+                          onClick={() => handleCountrySelect(country)}
+                          className="w-full flex items-center px-4 py-2 hover:bg-orange-50 focus:outline-none focus:bg-orange-50 transition-colors text-left border-b border-gray-100 last:border-b-0"
+                        >
+                          <span className="text-lg mr-3">{country.flag}</span>
+                          <span className="text-sm font-medium text-gray-900">
+                            {country.code}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Phone Number Input */}
+                <input
+                  type="tel"
+                  value={phoneNumber}
+                  onChange={handlePhoneChange}
+                  placeholder="Enter phone number"
+                  className="flex-1 px-4 py-2 focus:outline-none text-gray-900 placeholder-gray-500"
+                  required
+                />
+              </div>
+              
+              {/* Display Full Number Preview */}
+              {phoneNumber && (
+                <p className="mt-1 text-xs text-gray-600">
+                  Full number: {selectedCountry.code}{phoneNumber}
+                </p>
+              )}
             </div>
             
             <div>
@@ -252,4 +380,4 @@ const IndividualSignup = () => {
   );
 };
 
-export default IndividualSignup
+export default IndividualSignup;

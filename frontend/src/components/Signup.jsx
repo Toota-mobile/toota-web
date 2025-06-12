@@ -45,7 +45,7 @@ function Signup() {
               to="/signup/individual"
               className="w-full max-w-xs flex items-center justify-center bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-lg font-semibold gap-2 transition-colors"
             >
-              <FaUserPlus /> Individual Sign Up
+              <FaUserPlus /> User Sign Up
             </Link>
           </div>
 
