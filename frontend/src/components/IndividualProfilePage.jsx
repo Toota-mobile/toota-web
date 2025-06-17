@@ -5,7 +5,6 @@ import {
   FaTachometerAlt, FaMapMarkerAlt, FaImage, FaInfoCircle,
   FaArrowRight, FaStar, FaCheck, FaTimes, FaBox, FaMoneyBillWave, FaClock, FaExclamationTriangle
 } from "react-icons/fa";
-import md5 from "crypto-js/md5";
 import { MdLocalShipping } from "react-icons/md";
 
 function UserDashboard() {
