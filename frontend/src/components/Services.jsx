@@ -24,13 +24,13 @@ const servicesList = [
 
 const customerReviews = [
   {
-    name: "Emily Watson",
+    name: "Brant Watson",
     review: "Fast and reliable service! My package arrived earlier than expected.",
     rating: 5,
     location: "Johannesburg"
   },
   {
-    name: "James Rodriguez",
+    name: "Luyanda Dweli",
     review: "Great experience! The team was friendly and handled my furniture with care.",
     rating: 4,
     location: "Cape Town"
@@ -39,7 +39,7 @@ const customerReviews = [
     name: "Karabo Matlabe",
     review: "Scheduled delivery was seamless and on time. Highly recommend!",
     rating: 5,
-    location: "Durban"
+    location: "Johannesburg"
   }
 ];
 

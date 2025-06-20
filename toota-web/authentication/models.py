@@ -50,7 +50,7 @@ class AbstractCustomUser(AbstractBaseUser, PermissionsMixin):
     full_name = models.CharField(max_length=255, blank=True, null=True)
     # profile_pic = CloudinaryField('image', blank=True, null=True)
     phone_number = PhoneNumberField(blank=True, null=True)
-    # physical_address = models.TextField(blank=True, null=True)
+    physical_address = models.TextField(blank=True, null=True)
     is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     created_at = models.DateTimeField(default=timezone.now)

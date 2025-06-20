@@ -252,14 +252,6 @@ class ProfileView(APIView):
         
     @swagger_auto_schema(
         security=[{'Bearer': []}],
-        responses={200: UserProfileSerializer()}
-    )
-    def get(self, request):
-        serializer = UserProfileSerializer(request.user)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    @swagger_auto_schema(
-        security=[{'Bearer': []}],
 
         request_body=UserProfileSerializer,
         responses={
@@ -527,11 +519,15 @@ class ResendVerificationCodeView(APIView):
                             status=status.HTTP_400_BAD_REQUEST)
         
         # Try to find the user in either the User or Driver models.
+        obj_kwarg = {}
+        user_obj = None
         try:
             user_obj = User.objects.get(email=email)
+            obj_kwarg['user'] = user_obj
         except User.DoesNotExist:
             try:
                 user_obj = Driver.objects.get(email=email)
+                obj_kwarg['driver'] = user_obj
             except Driver.DoesNotExist:
                 return Response({"error": "User not found."},
                                 status=status.HTTP_404_NOT_FOUND)
@@ -539,7 +535,7 @@ class ResendVerificationCodeView(APIView):
         # Generate a new OTP code.
         new_otp_code = generate_otp()
         # Get or create the OTP instance for the user.
-        otp_instance, created = OTP.objects.get_or_create(user=user_obj)
+        otp_instance, created = OTP.objects.get_or_create(**obj_kwarg)
         otp_instance.code = new_otp_code
         # Update the creation timestamp (since auto_now_add doesn't update on save).
         otp_instance.created_at = now()
