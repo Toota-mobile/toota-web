@@ -5,10 +5,44 @@ import Navbar from "./Navbar";
 
 function DriverSignin() {
   const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    email: "",
+    password: ""
+  });
 
-  const handleLogin = (e) => {
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prevState => ({
+      ...prevState,
+      [name]: value
+    }),
+    );
+  }
+
+  const handleLogin = async(e) => {
     e.preventDefault();
     // Simulate successful login
+    const response = await fetch("http://localhost:8000/auth/login/driver/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify()
+    })
+    if (!response) {
+      throw new Error("Unable to login. Please check your network connection.");
+    }
+    const data = await response.json();
+    if (!response.ok) {
+      const messages = [];
+      if (data && data.error) messages.push(data.error);
+        
+      if (data) {
+        Object.values(data).forEach(v => {
+          if (Array.isArray(v)) messages.push(...v);
+        });
+      }
+        
+        throw new Error(messages.join(" ") || "Login failed");
+    }
     navigate("/driver-dashboard");
   };
 
