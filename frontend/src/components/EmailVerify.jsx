@@ -39,7 +39,7 @@ const EmailVerification = () => {
 
   const verifyPin = async (code) => {
     try {
-      const email = localStorage.getItem("email"); // Fixed: removed 'none'
+      const email = localStorage.getItem("email");
       const response = await fetch("https://toota-web.onrender.com/auth/verify-email/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -51,10 +51,9 @@ const EmailVerification = () => {
         throw new Error(data.message || "Verification failed");
       }
 
-      // console.log("Verification successful", data);
-      if (user === "user"){
+      if (user === "user") {
         navigate("/signin/individual");
-      }else {
+      } else {
         navigate("signin/driver");
       }
     } catch (error) {
@@ -85,11 +84,8 @@ const EmailVerification = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <div
-        className="flex-grow flex flex-col justify-center items-center p-6 bg-cover bg-center"
-        style={{ backgroundImage: "url('public/images/vcd.jpg')" }}
-      >
-        <div className="bg-white bg-opacity-80 p-8 rounded-lg shadow-lg w-full max-w-md text-center">
+      <div className="flex-grow flex flex-col justify-center items-center p-6 bg-gray-50">
+        <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md text-center">
           <h2 className="text-2xl font-bold text-orange-500 mb-6">Email Verification</h2>
           <p className="mb-4 text-gray-700">Enter the 4-digit code sent to your email.</p>
 

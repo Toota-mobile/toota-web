@@ -120,40 +120,6 @@ function UserDashboard() {
             <h2 className="text-2xl font-bold text-gray-800">Welcome back, {userEmail?.split('@')[0] || 'User'}!</h2>
             <p className="text-gray-600">What would you like to do today?</p>
           </div>
-          
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <Link 
-              to="/" 
-              className="bg-gray-50 hover:bg-gray-100 p-3 rounded-lg flex flex-col items-center transition-colors"
-            >
-              <FaHome className="text-orange-500 text-xl mb-1" />
-              <span className="text-sm font-medium">Home</span>
-            </Link>
-            
-            <button 
-              onClick={() => setActiveTab("newRequest")}
-              className="bg-gray-50 hover:bg-gray-100 p-3 rounded-lg flex flex-col items-center transition-colors"
-            >
-              <FaTruck className="text-orange-500 text-xl mb-1" />
-              <span className="text-sm font-medium">New Delivery</span>
-            </button>
-            
-            <Link 
-              to="/notifications" 
-              className="bg-gray-50 hover:bg-gray-100 p-3 rounded-lg flex flex-col items-center transition-colors"
-            >
-              <FaBell className="text-orange-500 text-xl mb-1" />
-              <span className="text-sm font-medium">Notifications</span>
-            </Link>
-            
-            <Link 
-              to="/help" 
-              className="bg-gray-50 hover:bg-gray-100 p-3 rounded-lg flex flex-col items-center transition-colors"
-            >
-              <FaQuestionCircle className="text-orange-500 text-xl mb-1" />
-              <span className="text-sm font-medium">Help</span>
-            </Link>
-          </div>
         </div>
       </div>
     );
@@ -212,7 +178,7 @@ function UserDashboard() {
             className={`py-3 px-6 font-medium flex items-center ${activeTab === 'newRequest' ? 'text-orange-500 border-b-2 border-orange-500' : 'text-gray-500 hover:text-gray-700'}`}
             onClick={() => setActiveTab('newRequest')}
           >
-            New Request
+            Current Request
           </button>
           <button
             className={`py-3 px-6 font-medium flex items-center ${activeTab === 'active' ? 'text-orange-500 border-b-2 border-orange-500' : 'text-gray-500 hover:text-gray-700'}`}
