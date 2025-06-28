@@ -1,13 +1,16 @@
-import React, { useState } from "react";
-import { FaArrowRight, FaStar, FaCheck, FaTimes, FaMapMarkerAlt, FaBox, FaMoneyBillWave, FaClock } from "react-icons/fa";
+import React, { useState, useEffect } from "react";
+import { FaArrowRight, FaStar, FaCheck, FaTimes, FaMapMarkerAlt, FaBox, FaMoneyBillWave, FaClock, FaBell } from "react-icons/fa";
 import { Link } from 'react-router-dom';
 
 const DriverDashboard = () => {
-  const [activeTab, setActiveTab] = useState("current"); // 'current', 'active', 'completed', 'history'
+  const [activeTab, setActiveTab] = useState("current");
   const [selectedRequest, setSelectedRequest] = useState(null);
+  const [incomingRequests, setIncomingRequests] = useState([]);
+  const [showNotification, setShowNotification] = useState(false);
+  const [hasNewRequests, setHasNewRequests] = useState(false);
 
   // Sample requests data
-  const activeRequests = [  // Renamed from availableRequests
+  const activeRequests = [
     {
       id: 1,
       type: "Parcel",
@@ -80,6 +83,31 @@ const DriverDashboard = () => {
     }
   ];
 
+  // Simulate incoming requests
+  useEffect(() => {
+    const interval = setInterval(() => {
+      // Only show notifications if not on the active requests tab
+      if (activeTab !== "active" && Math.random() > 0.7) {
+        const randomRequest = activeRequests[Math.floor(Math.random() * activeRequests.length)];
+        const newRequest = {
+          ...randomRequest,
+          id: Date.now(),
+          timestamp: new Date().toLocaleTimeString()
+        };
+        setIncomingRequests(prev => [...prev, newRequest]);
+        setShowNotification(true);
+        setHasNewRequests(true);
+        
+        // Auto-hide notification after 15 seconds
+        setTimeout(() => {
+          setShowNotification(false);
+        }, 15000);
+      }
+    }, 30000); // Check every 30 seconds
+
+    return () => clearInterval(interval);
+  }, [activeTab]);
+
   const handleAcceptRequest = (requestId) => {
     alert(`Request #${requestId} accepted!`);
     setActiveTab("current");
@@ -94,8 +122,98 @@ const DriverDashboard = () => {
     alert(`Request #${requestId} rejected`);
   };
 
+  const handleAcceptIncomingRequest = (request) => {
+    handleAcceptRequest(request.id);
+    setIncomingRequests(incomingRequests.filter(req => req.id !== request.id));
+    setShowNotification(false);
+    setHasNewRequests(false);
+  };
+
+  const handleRejectIncomingRequest = (requestId) => {
+    setIncomingRequests(incomingRequests.filter(req => req.id !== requestId));
+    setShowNotification(false);
+    if (incomingRequests.length <= 1) {
+      setHasNewRequests(false);
+    }
+  };
+
+  const handleViewAllRequests = () => {
+    setShowNotification(false);
+    setActiveTab("active");
+    setHasNewRequests(false);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Notification Popup */}
+      {showNotification && incomingRequests.length > 0 && (
+        <div className="fixed bottom-4 right-4 z-50 w-full max-w-md animate-fade-in-up">
+          <div className="bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden transform transition-all duration-300">
+            <div className="p-4 bg-orange-500 text-white flex justify-between items-center">
+              <h3 className="font-bold flex items-center">
+                <FaBell className="mr-2" /> New Delivery Request!
+              </h3>
+              <button 
+                onClick={() => setShowNotification(false)}
+                className="text-white hover:text-orange-200"
+              >
+                <FaTimes />
+              </button>
+            </div>
+            <div className="p-4">
+              <div className="flex items-start mb-3">
+                <div className="flex-1">
+                  <div className="flex justify-between">
+                    <h4 className="font-medium">{incomingRequests[0].customerName}</h4>
+                    <span className="text-xs text-gray-500">{incomingRequests[0].timestamp}</span>
+                  </div>
+                  <p className="text-sm text-gray-600">{incomingRequests[0].type} Delivery</p>
+                  <div className="flex items-center mt-1">
+                    <FaMapMarkerAlt className="text-orange-500 mr-1" size={12} />
+                    <span className="text-xs">{incomingRequests[0].distance}</span>
+                    <span className="mx-2">•</span>
+                    <FaMoneyBillWave className="text-orange-500 mr-1" size={12} />
+                    <span className="text-xs font-bold">{incomingRequests[0].price}</span>
+                  </div>
+                </div>
+                <div className="flex items-center">
+                  {[...Array(5)].map((_, i) => (
+                    <FaStar key={i} className={i < Math.floor(incomingRequests[0].customerRating) ? "text-orange-500" : "text-gray-300"} size={12} />
+                  ))}
+                </div>
+              </div>
+              
+              {incomingRequests[0].specialInstructions && (
+                <div className="bg-yellow-50 border-l-4 border-yellow-400 p-2 mb-3">
+                  <p className="text-yellow-700 text-xs">{incomingRequests[0].specialInstructions}</p>
+                </div>
+              )}
+              
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => handleAcceptIncomingRequest(incomingRequests[0])}
+                  className="flex-1 bg-green-500 text-white py-2 px-3 rounded hover:bg-green-600 text-sm flex items-center justify-center transition-colors"
+                >
+                  <FaCheck className="mr-1" /> Accept
+                </button>
+                <button
+                  onClick={() => handleRejectIncomingRequest(incomingRequests[0].id)}
+                  className="flex-1 bg-gray-200 text-gray-700 py-2 px-3 rounded hover:bg-gray-300 text-sm flex items-center justify-center transition-colors"
+                >
+                  <FaTimes className="mr-1" /> Decline
+                </button>
+                <button
+                  onClick={handleViewAllRequests}
+                  className="flex-1 bg-orange-500 text-white py-2 px-3 rounded hover:bg-orange-600 text-sm flex items-center justify-center transition-colors"
+                >
+                  View All
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Fixed Dashboard Header */}
       <header className="bg-white shadow-sm p-4 fixed top-0 left-0 right-0 z-50">
         <div className="container mx-auto flex justify-between items-center">
@@ -114,18 +232,23 @@ const DriverDashboard = () => {
             <Link to="/about" className="text-gray-600 hover:text-orange-500 font-medium">
               About
             </Link>
-            <Link to="/driver-profile">
-              <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300">
-                <span className="text-gray-600">JD</span>
-              </div>
-            </Link>
+            <div className="relative">
+              <Link to="/driver-profile">
+                <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300 relative">
+                  <span className="text-gray-600">JD</span>
+                  {hasNewRequests && (
+                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-white"></span>
+                  )}
+                </div>
+              </Link>
+            </div>
           </nav>
         </div>
       </header>
       
       {/* Main Content with top padding */}
       <main className="container mx-auto p-4 pt-24">
-        {/* Dashboard Tabs - Updated labels */}
+        {/* Dashboard Tabs */}
         <div className="flex border-b border-gray-200 mb-6 overflow-x-auto">
           <button
             className={`py-3 px-6 font-medium flex items-center whitespace-nowrap ${activeTab === 'current' ? 'text-orange-500 border-b-2 border-orange-500' : 'text-gray-500 hover:text-gray-700'}`}
@@ -138,11 +261,14 @@ const DriverDashboard = () => {
           </button>
           <button
             className={`py-3 px-6 font-medium flex items-center whitespace-nowrap ${activeTab === 'active' ? 'text-orange-500 border-b-2 border-orange-500' : 'text-gray-500 hover:text-gray-700'}`}
-            onClick={() => setActiveTab('active')}
+            onClick={() => {
+              setActiveTab('active');
+              setHasNewRequests(false);
+            }}
           >
             Active Requests
             <span className="ml-2 bg-orange-500 text-white text-xs px-2 py-1 rounded-full">
-              {activeRequests.length}
+              {activeRequests.length + (hasNewRequests ? 1 : 0)}
             </span>
           </button>
           <button
@@ -254,8 +380,99 @@ const DriverDashboard = () => {
           </div>
         )}
 
-        {activeTab === "active" && (  // Changed from "available" to "active"
+        {activeTab === "active" && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {hasNewRequests && incomingRequests.length > 0 && (
+              incomingRequests.map((request) => (
+                <div key={request.id} className="bg-white rounded-lg shadow-md overflow-hidden border-2 border-orange-500 relative">
+                  <div className="absolute top-2 right-2 bg-orange-500 text-white text-xs px-2 py-1 rounded-full">
+                    New!
+                  </div>
+                  <div className="p-5">
+                    <div className="flex justify-between items-start mb-3">
+                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        request.type === "Parcel" ? "bg-blue-100 text-blue-800" :
+                        request.type === "Furniture" ? "bg-purple-100 text-purple-800" :
+                        "bg-green-100 text-green-800"
+                      }`}>
+                        {request.type}
+                      </span>
+                      <span className="text-gray-500 text-sm flex items-center">
+                        <FaMapMarkerAlt className="mr-1" /> {request.distance}
+                      </span>
+                    </div>
+
+                    <h3 className="font-bold text-lg mb-2">{request.customerName}</h3>
+                    <div className="flex items-center mb-3">
+                      {[...Array(5)].map((_, i) => (
+                        <FaStar key={i} className={i < Math.floor(request.customerRating) ? "text-orange-500" : "text-gray-300"} />
+                      ))}
+                      <span className="text-gray-500 text-sm ml-1">{request.customerRating}</span>
+                    </div>
+
+                    <div className="space-y-3 mb-4">
+                      <div className="flex items-start">
+                        <FaBox className="text-orange-500 mt-1 mr-2 flex-shrink-0" />
+                        <div>
+                          <p className="font-medium text-gray-700">Items:</p>
+                          <p className="text-gray-600">{request.items}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start">
+                        <FaMapMarkerAlt className="text-orange-500 mt-1 mr-2 flex-shrink-0" />
+                        <div>
+                          <p className="font-medium text-gray-700">Pickup:</p>
+                          <p className="text-gray-600">{request.pickup}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start">
+                        <FaArrowRight className="text-orange-500 mt-1 mr-2 flex-shrink-0" />
+                        <div>
+                          <p className="font-medium text-gray-700">Dropoff:</p>
+                          <p className="text-gray-600">{request.dropoff}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start">
+                        <FaMoneyBillWave className="text-orange-500 mt-1 mr-2 flex-shrink-0" />
+                        <div>
+                          <p className="font-medium text-gray-700">Earnings:</p>
+                          <p className="text-gray-600 font-bold">{request.price}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start">
+                        <FaClock className="text-orange-500 mt-1 mr-2 flex-shrink-0" />
+                        <div>
+                          <p className="font-medium text-gray-700">Time Estimate:</p>
+                          <p className="text-gray-600">{request.timeEstimate}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {request.specialInstructions && (
+                      <div className="bg-yellow-50 border-l-4 border-yellow-400 p-3 mb-4">
+                        <p className="text-yellow-700 text-sm">{request.specialInstructions}</p>
+                      </div>
+                    )}
+
+                    <div className="flex space-x-3">
+                      <button
+                        onClick={() => handleAcceptRequest(request.id)}
+                        className="flex-1 bg-orange-500 text-white py-2 px-4 rounded hover:bg-orange-600 flex items-center justify-center"
+                      >
+                        <FaCheck className="mr-2" /> Accept
+                      </button>
+                      <button
+                        onClick={() => handleRejectRequest(request.id)}
+                        className="flex-1 bg-gray-200 text-gray-700 py-2 px-4 rounded hover:bg-gray-300 flex items-center justify-center"
+                      >
+                        <FaTimes className="mr-2" /> Decline
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+            
             {activeRequests.map((request) => (
               <div key={request.id} className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow">
                 <div className="p-5">
@@ -495,11 +712,17 @@ const DriverDashboard = () => {
             <span className="text-xs mt-1">Current</span>
           </button>
           <button
-            onClick={() => setActiveTab("active")}
-            className={`py-3 px-4 flex flex-col items-center ${activeTab === 'active' ? 'text-orange-500' : 'text-gray-500'}`}
+            onClick={() => {
+              setActiveTab("active");
+              setHasNewRequests(false);
+            }}
+            className={`py-3 px-4 flex flex-col items-center relative ${activeTab === 'active' ? 'text-orange-500' : 'text-gray-500'}`}
           >
             <FaBox />
             <span className="text-xs mt-1">Active</span>
+            {hasNewRequests && (
+              <span className="absolute top-1 right-4 w-2 h-2 bg-red-500 rounded-full"></span>
+            )}
           </button>
           <button
             onClick={() => setActiveTab("completed")}
