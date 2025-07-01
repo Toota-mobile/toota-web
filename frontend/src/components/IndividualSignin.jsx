@@ -156,7 +156,7 @@ function IndividualSignin() {
                   id="remember-me"
                   name="remember-me"
                   type="checkbox"
-                  className="h-4 w-4 text-orange-500 focus:ring-orange-500 border-gray-300 rounded"
+                  className="h-4 w-4 text-orange-500 focus:ring-orange-500 border-gray-300 rounded cursor-pointer"
                 />
                 <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
                   Remember me
@@ -166,7 +166,7 @@ function IndividualSignin() {
               <button
                 type="button"
                 onClick={() => setShowForgotPassword(true)}
-                className="text-sm font-medium text-orange-500 hover:text-orange-600"
+                className="text-sm font-medium text-orange-500 hover:text-orange-600 cursor-pointer"
               >
                 Forgot password?
               </button>
@@ -175,7 +175,7 @@ function IndividualSignin() {
             <button
               type="submit"
               disabled={loading}
-              className={`w-full flex items-center justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-white ${
+              className={`w-full flex items-center justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-white cursor-pointer ${
                 loading ? "bg-orange-400" : "bg-orange-500 hover:bg-orange-600"
               } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors`}
             >

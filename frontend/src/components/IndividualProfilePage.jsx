@@ -120,6 +120,40 @@ function UserDashboard() {
             <h2 className="text-2xl font-bold text-gray-800">Welcome back, {userEmail?.split('@')[0] || 'User'}!</h2>
             <p className="text-gray-600">What would you like to do today?</p>
           </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <Link 
+              to="/" 
+              className="bg-gray-50 hover:bg-gray-100 p-3 rounded-lg flex flex-col items-center transition-colors"
+            >
+              <FaHome className="text-orange-500 text-xl mb-1" />
+              <span className="text-sm font-medium">Home</span>
+            </Link>
+            
+            <button 
+              onClick={() => setActiveTab("newRequest")}
+              className="bg-gray-50 hover:bg-gray-100 p-3 rounded-lg flex flex-col items-center transition-colors"
+            >
+              <FaTruck className="text-orange-500 text-xl mb-1" />
+              <span className="text-sm font-medium">New Delivery</span>
+            </button>
+            
+            <Link 
+              to="/notifications" 
+              className="bg-gray-50 hover:bg-gray-100 p-3 rounded-lg flex flex-col items-center transition-colors"
+            >
+              <FaBell className="text-orange-500 text-xl mb-1" />
+              <span className="text-sm font-medium">Notifications</span>
+            </Link>
+            
+            <Link 
+              to="/help" 
+              className="bg-gray-50 hover:bg-gray-100 p-3 rounded-lg flex flex-col items-center transition-colors"
+            >
+              <FaQuestionCircle className="text-orange-500 text-xl mb-1" />
+              <span className="text-sm font-medium">Help</span>
+            </Link>
+          </div>
         </div>
       </div>
     );
@@ -185,18 +219,18 @@ function UserDashboard() {
             onClick={() => setActiveTab('active')}
           >
             Active Deliveries
-            <span className="ml-2 bg-orange-500 text-white text-xs px-2 py-1 rounded-full">
+            {/* <span className="ml-2 bg-orange-500 text-white text-xs px-2 py-1 rounded-full">
               {activeRequests.length}
-            </span>
+            </span> */}
           </button>
           <button
             className={`py-3 px-6 font-medium flex items-center ${activeTab === 'history' ? 'text-orange-500 border-b-2 border-orange-500' : 'text-gray-500 hover:text-gray-700'}`}
             onClick={() => setActiveTab('history')}
           >
             History
-            <span className="ml-2 bg-orange-500 text-white text-xs px-2 py-1 rounded-full">
+            {/* <span className="ml-2 bg-orange-500 text-white text-xs px-2 py-1 rounded-full">
               {completedRequests.length}
-            </span>
+            </span> */}
           </button>
         </div>
 
